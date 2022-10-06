@@ -104,7 +104,11 @@
     <Content Include="Dependencies\MelonLoader.dll" />
     <Content Include="Dependencies\ModThatIsNotMod.dll" />
     <Content Include="Dependencies\RootMotion.dll" />
-    <Content Include="Dependencies\ShockWaveIMU.dll" />
+    <ContentWithTargetPath Include="Dependencies\ShockWaveIMU.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <TargetPath>ShockWaveIMU.dll</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="Dependencies\ShockWaveIMU.dll" />
     <Content Include="Dependencies\ShockwaveManager.dll" />
     <Content Include="Dependencies\UnhollowerBaseLib.dll" />
     <Content Include="Dependencies\UnhollowerRuntimeLib.dll" />
