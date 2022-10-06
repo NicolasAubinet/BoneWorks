@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="BodyTracking\AvatarTransform_IK.cs" />
     <Compile Include="Haptics\ShockwaveCollider.cs" />
+    <Compile Include="Hooks.cs" />
     <Compile Include="ShockwaveBoneWorks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
