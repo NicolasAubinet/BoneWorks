@@ -95,6 +95,24 @@
     <Compile Include="ShockwaveBoneWorks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dependencies\0Harmony.dll" />
+    <Content Include="Dependencies\Assembly-CSharp.dll" />
+    <Content Include="Dependencies\gitkeep" />
+    <Content Include="Dependencies\Il2Cppmscorlib.dll" />
+    <Content Include="Dependencies\MelonLoader.dll" />
+    <Content Include="Dependencies\ModThatIsNotMod.dll" />
+    <Content Include="Dependencies\RootMotion.dll" />
+    <Content Include="Dependencies\ShockWaveIMU.dll" />
+    <Content Include="Dependencies\ShockwaveManager.dll" />
+    <Content Include="Dependencies\UnhollowerBaseLib.dll" />
+    <Content Include="Dependencies\UnhollowerRuntimeLib.dll" />
+    <Content Include="Dependencies\UnityEngine.AnimationModule.dll" />
+    <Content Include="Dependencies\UnityEngine.CoreModule.dll" />
+    <Content Include="Dependencies\UnityEngine.dll" />
+    <Content Include="Dependencies\UnityEngine.ParticleSystemModule.dll" />
+    <Content Include="Dependencies\UnityEngine.PhysicsModule.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
