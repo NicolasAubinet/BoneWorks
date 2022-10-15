@@ -125,12 +125,14 @@ namespace ModThatIsNotMod.MonoBehaviours
 
         void OnCollisionEnter(Collision collision)
         {
-
+            if (collision.contactCount <= 0 || collision.contacts.Length <= 0)
+            {
+                return;
+            }
 
             ContactPoint[] contacts = new ContactPoint[collision.contactCount];
             collision.GetContacts(contacts);
 
-           
             float impactPerPoint;
             ContactPoint contact = collision.GetContact(0);
            
@@ -183,10 +185,13 @@ namespace ModThatIsNotMod.MonoBehaviours
         }
         void OnCollisionStay(Collision collision)
         {
+            if (collision.contactCount <= 0 || collision.contacts.Length <= 0)
+            {
+                return;
+            }
 
             ContactPoint[] contacts = new ContactPoint[collision.contactCount];
             collision.GetContacts(contacts);
-
 
             float impactPerPoint;
 
@@ -204,11 +209,7 @@ namespace ModThatIsNotMod.MonoBehaviours
                     Ang = 360 - Ang;
               
                 manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 25);
-
-
             }
-
-
         }
         void OnParticleCollision(GameObject partSystem)
         {
