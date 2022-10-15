@@ -1,11 +1,15 @@
-﻿using Il2CppSystem.Reflection;
+﻿using System.Reflection;
 using MelonLoader;
-using UnityEngine;
-using ModThatIsNotMod.MonoBehaviours;
 using ModThatIsNotMod;
+using ModThatIsNotMod.MonoBehaviours;
+using StressLevelZero;
 using StressLevelZero.Interaction;
+using StressLevelZero.Player;
 using StressLevelZero.Props.Weapons;
+using StressLevelZero.Rig;
 using StressLevelZero.VRMK;
+using UnityEngine;
+using GravityGun = StressLevelZero.Interaction.GravityGun;
 
 namespace ShockwaveBoneWorks
 {
@@ -21,10 +25,12 @@ namespace ShockwaveBoneWorks
 
     public class ShockwaveBoneWorks : MelonMod
     {
-        ShockwaveManager suit;
-        Animator playerAnimator;
-        Transform playArea;
-        Transform Physbody;
+        private ShockwaveManager suit;
+        private Animator playerAnimator;
+        private Transform playArea;
+        private Transform Physbody;
+
+        private ShockwavePlayer shockwavePlayer = new ShockwavePlayer();
 
         public override void OnApplicationStart()
         {
@@ -40,12 +46,12 @@ namespace ShockwaveBoneWorks
 
         void RegisterHooks()
         {
-            Hooking.OnPostFireGun += GunHooks_OnGunFire;
+            Hooking.OnPostFireGun += Hooks.GunHooks_OnGunFire;
 
-            const System.Reflection.BindingFlags originalBindingFlags =
-                (System.Reflection.BindingFlags)(BindingFlags.Instance | BindingFlags.Public);
-            const System.Reflection.BindingFlags hookBindingFlags =
-                (System.Reflection.BindingFlags)(BindingFlags.Static | BindingFlags.NonPublic);
+            const BindingFlags originalBindingFlags =
+                (BindingFlags)(Il2CppSystem.Reflection.BindingFlags.Instance | Il2CppSystem.Reflection.BindingFlags.Public);
+            const BindingFlags hookBindingFlags =
+                (BindingFlags)(Il2CppSystem.Reflection.BindingFlags.Static | Il2CppSystem.Reflection.BindingFlags.NonPublic);
 
             Hooking.CreateHook(
                 typeof(PlayerDamageReceiver).GetMethod("ReceiveAttack", originalBindingFlags),
@@ -87,13 +93,13 @@ namespace ShockwaveBoneWorks
                 typeof(GrapplingHook).GetMethod("FireHook", originalBindingFlags),
                 typeof(Hooks).GetMethod("GrapplingHookFire", hookBindingFlags));
             Hooking.CreateHook(
-                typeof(StressLevelZero.Interaction.GravityGun).GetMethod("Grab", originalBindingFlags),
+                typeof(GravityGun).GetMethod("Grab", originalBindingFlags),
                 typeof(Hooks).GetMethod("GravityGunGrab", hookBindingFlags));
             Hooking.CreateHook(
-                typeof(StressLevelZero.Interaction.GravityGun).GetMethod("Push", originalBindingFlags),
+                typeof(GravityGun).GetMethod("Push", originalBindingFlags),
                 typeof(Hooks).GetMethod("GravityGunPush", hookBindingFlags));
             Hooking.CreateHook(
-                typeof(StressLevelZero.Interaction.GravityGun).GetMethod("Pull", originalBindingFlags),
+                typeof(GravityGun).GetMethod("Pull", originalBindingFlags),
                 typeof(Hooks).GetMethod("GravityGunPull", hookBindingFlags));
             Hooking.CreateHook(
                 typeof(GrenadeLauncher).GetMethod("OnFire", originalBindingFlags),
@@ -110,7 +116,6 @@ namespace ShockwaveBoneWorks
             Hooking.CreateHook(
                 typeof(Haptor).GetMethod("SENDHAPTIC", originalBindingFlags),
                 typeof(Hooks).GetMethod("SENDHAPTIC", hookBindingFlags));
-
         }
 
         void SuitAdded(GameObject suitObject)
@@ -121,16 +126,20 @@ namespace ShockwaveBoneWorks
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             MelonLogger.Msg("OnLevelWasLoaded: " + sceneName);
+
+            var health = Object.FindObjectOfType<Player_Health>();
+            var saveSpots = Object.FindObjectsOfType<SaveSpot>();
+            var weaponSlots = Object.FindObjectsOfType<HandWeaponSlotReciever>();
+            shockwavePlayer.Initialize(health, saveSpots, weaponSlots);
         }
 
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             MelonLogger.Msg("OnLevelWasInitialized: " + sceneName);
-            
-         
-            Physbody = GameObject.FindObjectOfType<StressLevelZero.Rig.PhysicsRig>().transform;
-            playerAnimator = GameObject.FindObjectOfType<StressLevelZero.Player.CharacterAnimationManager>().gameObject.GetComponent<Animator>(); ;
-            playArea = GameObject.FindObjectOfType<StressLevelZero.Rig.SteamControllerRig>().transform.GetChild(0);
+
+            Physbody = GameObject.FindObjectOfType<PhysicsRig>().transform;
+            playerAnimator = GameObject.FindObjectOfType<CharacterAnimationManager>().gameObject.GetComponent<Animator>(); ;
+            playArea = GameObject.FindObjectOfType<SteamControllerRig>().transform.GetChild(0);
        //     CapsuleCollider[] torsoColliders = Physbody.GetChild(3).GetComponentsInChildren<CapsuleCollider>();
        //     BoxCollider[] chestFront = Physbody.GetChild(3).GetComponentsInChildren<BoxCollider>();
             CapsuleCollider legCollider = Physbody.GetChild(4).GetComponentInChildren<CapsuleCollider>();
@@ -156,14 +165,17 @@ namespace ShockwaveBoneWorks
             rightThighCollider.bodyForward = playArea.forward;
             rightCalfCollider.bodyForward = playArea.forward;
         }
-       
+
+        public override void OnUpdate()
+        {
+            shockwavePlayer.CheckHealth();
+            shockwavePlayer.CheckSaveSpot();
+            shockwavePlayer.CheckWeaponSlots();
+        }
+
         public override void OnApplicationQuit()
         {
             suit.DisconnectSuit();
-        }
-        
-        private void GunHooks_OnGunFire(Gun gun)
-        {
         }
     }
 }
