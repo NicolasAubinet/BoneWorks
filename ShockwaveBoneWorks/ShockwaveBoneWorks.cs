@@ -1,15 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using MelonLoader;
 using ModThatIsNotMod;
 using ModThatIsNotMod.MonoBehaviours;
+using ShockwaveAlyx;
 using StressLevelZero;
 using StressLevelZero.Interaction;
 using StressLevelZero.Player;
 using StressLevelZero.Props.Weapons;
 using StressLevelZero.Rig;
 using StressLevelZero.VRMK;
+using UnhollowerBaseLib;
 using UnityEngine;
 using GravityGun = StressLevelZero.Interaction.GravityGun;
+using Object = UnityEngine.Object;
 
 namespace ShockwaveBoneWorks
 {
@@ -28,7 +33,7 @@ namespace ShockwaveBoneWorks
         private ShockwaveManager suit;
         private Animator playerAnimator;
         private Transform playArea;
-        private Transform Physbody;
+        // private Transform Physbody;
 
         private ShockwavePlayer shockwavePlayer = new ShockwavePlayer();
 
@@ -131,9 +136,92 @@ namespace ShockwaveBoneWorks
             var saveSpots = Object.FindObjectsOfType<SaveSpot>();
             var weaponSlots = Object.FindObjectsOfType<HandWeaponSlotReciever>();
             shockwavePlayer.Initialize(health, saveSpots, weaponSlots);
+
+            InitializeShockwaveColliders();
+
+            ShockwaveEngine.PlayPattern(new HapticGroupPattern(ShockwaveManager.HapticGroup.LEFT_LOWER_LEG, 0.2f, 30));
+            ShockwaveEngine.PlayPattern(new HapticGroupPattern(ShockwaveManager.HapticGroup.RIGHT_LOWER_LEG, 0.2f, 30));
         }
 
-        public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+        private void InitializeShockwaveColliders()
+        {
+            playerAnimator = GameObject.FindObjectOfType<CharacterAnimationManager>().gameObject.GetComponent<Animator>(); ;
+            playArea = GameObject.FindObjectOfType<SteamControllerRig>().transform.GetChild(0);
+
+            Il2CppArrayBase<PlayerDamageReceiver> pdrs = Object.FindObjectsOfType<PlayerDamageReceiver>();
+
+            if (pdrs != null && pdrs.Count > 0)
+            {
+                foreach (var pdr in pdrs)
+                {
+                    MelonLogger.Msg("Player Damage Receiver: BodyPart:" + pdr.bodyPart + " Name:" + pdr.name + " GameObject:" + pdr.gameObject.name);
+
+                    if (pdr.gameObject != null)
+                    {
+                        foreach (ColliderRegion colliderRegion in GetHapticRegions(pdr.bodyPart))
+                        {
+                            ShockwaveCollider shockwaveCollider = pdr.gameObject.AddComponent<ShockwaveCollider>();
+                            if (shockwaveCollider != null)
+                            {
+                                MelonLogger.Msg("\tAdded collider " + colliderRegion + " to " + pdr.gameObject.name + " (" + pdr.gameObject.GetInstanceID() + ")");
+                                shockwaveCollider.animator = playerAnimator;
+                                shockwaveCollider.bodyForward = playArea.forward;
+                                shockwaveCollider.region = colliderRegion;
+                            }
+                            else
+                            {
+                                MelonLogger.Msg("\tAdding shockwave collider failed for " + colliderRegion);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MelonLogger.Msg("No PlayerDamageReceiver found");
+            }
+        }
+
+        List<ColliderRegion> GetHapticRegions(PlayerDamageReceiver.BodyPart bodyPart)
+        {
+            List<ColliderRegion> regions = new List<ColliderRegion>();
+            switch (bodyPart)
+            {
+                case PlayerDamageReceiver.BodyPart.Head:
+                    regions.Add(ColliderRegion.SHOULDERS);
+                    break;
+                case PlayerDamageReceiver.BodyPart.Chest:
+                    regions.Add(ColliderRegion.CHEST);
+                    break;
+                case PlayerDamageReceiver.BodyPart.Pelvis:
+                    regions.Add(ColliderRegion.PELVIS);
+                    break;
+                case PlayerDamageReceiver.BodyPart.LeftArm:
+                    regions.Add(ColliderRegion.LEFTUPPERARM);
+                    regions.Add(ColliderRegion.LEFTLOWERARM);
+                    break;
+                case PlayerDamageReceiver.BodyPart.LeftLeg:
+                    regions.Add(ColliderRegion.LEFTUPPERLEG);
+                    regions.Add(ColliderRegion.LEFTLOWERLEG);
+                    break;
+                case PlayerDamageReceiver.BodyPart.RightArm:
+                    regions.Add(ColliderRegion.RIGHTUPPERARM);
+                    regions.Add(ColliderRegion.RIGHTLOWERARM);
+                    break;
+                case PlayerDamageReceiver.BodyPart.RightLeg:
+                    regions.Add(ColliderRegion.RIGHTUPPERLEG);
+                    regions.Add(ColliderRegion.RIGHTLOWERLEG);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(bodyPart), bodyPart, null);
+            }
+
+            return regions;
+        }
+
+        /*
+        // public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+        public void Unused(string sceneName)
         {
             MelonLogger.Msg("OnLevelWasInitialized: " + sceneName);
 
@@ -165,6 +253,7 @@ namespace ShockwaveBoneWorks
             rightThighCollider.bodyForward = playArea.forward;
             rightCalfCollider.bodyForward = playArea.forward;
         }
+        */
 
         public override void OnUpdate()
         {

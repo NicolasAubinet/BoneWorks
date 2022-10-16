@@ -18,10 +18,8 @@ namespace ShockwaveBoneWorks
 
         private bool _leftShoulderSlotUsed = false;
         private bool _rightShoulderSlotUsed = false;
-        private bool _backSlotUsed = false;
         private bool _leftSideArmSlotUsed = false;
         private bool _rightSideArmSlotUsed = false;
-        private bool _headSlotUsed = false;
         private float _saveSpotPerc = 0f;
 
         private Task _rightHandSaveTask = null;
