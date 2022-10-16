@@ -130,59 +130,60 @@ namespace ModThatIsNotMod.MonoBehaviours
                 return;
             }
 
-            ContactPoint[] contacts = new ContactPoint[collision.contactCount];
-            collision.GetContacts(contacts);
-
-            float impactPerPoint;
-            ContactPoint contact = collision.GetContact(0);
-           
+            try
             {
+                ContactPoint[] contacts = new ContactPoint[collision.contactCount];
+                collision.GetContacts(contacts);
+
+                float impactPerPoint;
+                ContactPoint contact = collision.GetContact(0);
+
                  impactPerPoint = 0.4f * collision.impulse.magnitude / collision.contactCount;//For Unconstrained RigidBodies
-          
+
               //  foreach (ContactPoint contact in contacts)
                 {
                     Vector3 localPosition = initialBoneRotation * Quaternion.Inverse(attachedBone.rotation) * (contact.point - attachedBone.position);
-                 
-                    
+
+
                     float Ang = Vector3.SignedAngle(Vector3.forward, new Vector3(localPosition.x, 0, localPosition.z), Vector3.up);
-                   
+
                     if (Ang < 0)
                         Ang = -Ang;
                     else
                         Ang = 360 - Ang;
-                   
+
                     if (impactPerPoint > 6)
                     {
                         manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 250);
-                      
+
                     }
                     else if (impactPerPoint > 2)
                     {
                         manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 150 + (impactPerPoint - 2) * 25);
-                 
+
                     }
                     else if (impactPerPoint > 1)
                     {
                         manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 100 + (impactPerPoint - 1) * 50);
-                       
+
                     }
                     else if (impactPerPoint > 0.5f)
                     {
                         manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint * 2, Ang, localPosition.y + boneY, regionHeight, 150 + impactPerPoint * 100);
-                        
+
                     }
                     else
                     {
                         manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint * 3f, Ang, localPosition.y + boneY, regionHeight, 50);
-                       
+
                     }
                 }
             }
-
-
-
-
+            catch
+            {
+            }
         }
+
         void OnCollisionStay(Collision collision)
         {
             if (collision.contactCount <= 0 || collision.contacts.Length <= 0)
@@ -190,27 +191,34 @@ namespace ModThatIsNotMod.MonoBehaviours
                 return;
             }
 
-            ContactPoint[] contacts = new ContactPoint[collision.contactCount];
-            collision.GetContacts(contacts);
-
-            float impactPerPoint;
-
-            ContactPoint contact = collision.GetContact(0);
-
-            impactPerPoint = 0.5f;
-           // foreach (ContactPoint contact in contacts)
+            try
             {
-                Vector3 localPosition = initialBoneRotation * Quaternion.Inverse(attachedBone.rotation) * (contact.point - attachedBone.position);
-                float Ang = Vector3.SignedAngle(Vector3.forward, new Vector3(localPosition.x, 0, localPosition.z), Vector3.up);
+                ContactPoint[] contacts = new ContactPoint[collision.contactCount];
+                collision.GetContacts(contacts);
 
-                if (Ang < 0)
-                    Ang = -Ang;
-                else
-                    Ang = 360 - Ang;
-              
-                manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 25);
+                float impactPerPoint;
+
+                ContactPoint contact = collision.GetContact(0);
+
+                impactPerPoint = 0.5f;
+               // foreach (ContactPoint contact in contacts)
+                {
+                    Vector3 localPosition = initialBoneRotation * Quaternion.Inverse(attachedBone.rotation) * (contact.point - attachedBone.position);
+                    float Ang = Vector3.SignedAngle(Vector3.forward, new Vector3(localPosition.x, 0, localPosition.z), Vector3.up);
+
+                    if (Ang < 0)
+                        Ang = -Ang;
+                    else
+                        Ang = 360 - Ang;
+
+                    manager.sendHapticsPulsewithPositionInfo(hapticRegion, impactPerPoint, Ang, localPosition.y + boneY, regionHeight, 25);
+                }
+            }
+            catch
+            {
             }
         }
+
         void OnParticleCollision(GameObject partSystem)
         {
 
