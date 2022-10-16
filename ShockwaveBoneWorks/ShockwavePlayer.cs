@@ -103,7 +103,7 @@ namespace ShockwaveBoneWorks
             var pattern = new HapticIndexPattern(new[]
             {
                 54, 52, 50, 48, 38, 39, 36, 37, 49, 51, 53, 55
-            }, 0.8f, 25);
+            }, 0.6f, 25);
             await ShockwaveEngine.PlayPatternFunc(pattern);
         }
 
@@ -112,7 +112,7 @@ namespace ShockwaveBoneWorks
             var pattern = new HapticIndexPattern(new[]
             {
                 46, 44, 42, 40, 33, 32, 35, 34, 41, 43, 45, 47
-            }, 0.8f, 25);
+            }, 0.6f, 25);
             await ShockwaveEngine.PlayPatternFunc(pattern);
         }
 
