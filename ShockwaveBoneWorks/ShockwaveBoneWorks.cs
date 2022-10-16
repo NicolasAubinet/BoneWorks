@@ -155,8 +155,10 @@ namespace ShockwaveBoneWorks
                 foreach (var pdr in pdrs)
                 {
                     MelonLogger.Msg("Player Damage Receiver: BodyPart:" + pdr.bodyPart + " Name:" + pdr.name + " GameObject:" + pdr.gameObject.name);
+                    bool isDisabledBodyPart = pdr.bodyPart == PlayerDamageReceiver.BodyPart.LeftLeg ||
+                                              pdr.bodyPart == PlayerDamageReceiver.BodyPart.RightLeg; // legs collisions don't work well, left leg causes collisions when moving
 
-                    if (pdr.gameObject != null)
+                    if (pdr.gameObject != null && !isDisabledBodyPart)
                     {
                         foreach (ColliderRegion colliderRegion in GetHapticRegions(pdr.bodyPart))
                         {
